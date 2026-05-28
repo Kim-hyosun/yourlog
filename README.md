@@ -229,3 +229,22 @@ blog-frontend/src/
   ```
 - `api/index.js` 내부의 Koa app이 원본 `req.url`을 그대로 받아 자체 라우팅 (CORS, JWT, /docs, /api/* 모두 일관 처리)
 
+### "Cannot send secure cookie over unencrypted connection" (Vercel + secure cookie)
+
+**현상**
+- 프로덕션에서 로그인 시도 시 500 응답 + 본문 `{"message":"Cannot send secure cookie over unencrypted connection"}`
+- 로컬에선 정상 (dev 환경에서는 cookie에 `secure: true`를 안 붙이는 분기)
+
+**원인**
+- Vercel(및 Heroku/Cloudflare 등 reverse proxy)은 **엣지에서 HTTPS를 종단**하고 함수에는 HTTP로 요청을 넘김
+- Koa는 `ctx.protocol === 'https'`일 때만 `secure: true` 쿠키 set을 허용
+- 기본 설정에서 Koa는 `X-Forwarded-Proto` 헤더를 신뢰하지 않음 → "내부 HTTP니까 secure 쿠키 거부"
+
+**해결**
+- `app.proxy = true` 한 줄 추가 (Koa app 생성 직후):
+  ```js
+  const app = new Koa();
+  app.proxy = true; // X-Forwarded-Proto 신뢰 → ctx.secure가 올바르게 평가됨
+  ```
+- 같은 패턴이 필요한 다른 시그널: `ctx.ip`(X-Forwarded-For), `ctx.hostname`(X-Forwarded-Host) 등도 함께 정상화됨
+

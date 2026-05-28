@@ -15,6 +15,12 @@ import { connectDB } from './db.js';
 import openApiSpec from './docs/openapi.js';
 
 const app = new Koa();
+// Vercel은 엣지에서 HTTPS를 종단하고 함수엔 HTTP로 넘긴다. proxy=true로 두면
+// X-Forwarded-Proto 같은 헤더를 신뢰해서 ctx.secure가 올바르게 true가 되고,
+// authCookie의 `secure: true` 옵션이 "Cannot send secure cookie over unencrypted"
+// 에러 없이 동작한다.
+app.proxy = true;
+
 const router = new Router();
 
 // 하위 미들웨어에서 throw해도 응답 직전에 헤더가 wipe되지 않도록 가장 바깥에서
