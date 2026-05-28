@@ -29,14 +29,14 @@ yourlog/
 | HTML sanitize | **sanitize-html** 2 (글 저장 시 XSS 방어) |
 | 환경 변수 | **dotenv** 7 (로컬), Vercel env (프로덕션) |
 | Dev | **nodemon** 2 |
-| 호스팅 | **Vercel** (serverless functions, `api/[...path].js` 진입점) |
+| 호스팅 | **Vercel** (serverless function `api/index.js` + 모든 path → `/api` rewrite) |
 | 자체 구현 | IP당 15분 20회 인메모리 레이트리미터 (로컬 한정 — serverless에선 실효 없음) |
 
 ### 디렉토리 구조
 ```
 blog-backend/
 ├── api/
-│   └── [...path].js      # Vercel serverless 진입점 (catch-all → app.callback())
+│   └── index.js          # Vercel serverless 진입점 (Koa app.callback() 그대로 export)
 ├── src/
 │   ├── index.js          # 로컬 dev 진입점 (app.listen만 수행)
 │   ├── app.js            # Koa 앱 구성 (로컬·Vercel 공용)
@@ -51,7 +51,7 @@ blog-backend/
 │   │   ├── checkLoggedIn.js # 로그인 가드
 │   │   └── rateLimit.js     # 무차별 대입 방지(로컬 한정)
 │   └── models/           # Mongoose 스키마 (User, Post)
-└── (vercel.json 불필요 — api/ 폴더 컨벤션으로 자동 함수 등록)
+└── vercel.json           # 모든 path를 /api로 rewrite → api/index.js의 Koa app이 라우팅
 ```
 
 ---
@@ -211,4 +211,21 @@ blog-frontend/src/
   ```
 - 해시 포맷이 호환되므로 **기존 사용자 비밀번호 마이그레이션 불필요**
 - 성능은 네이티브 대비 ~2배 느리지만 (login 한 번에 ~50ms → ~100ms) 개인 블로그 트래픽에선 체감 영향 없음
+
+### Vercel `[...path]` catch-all이 깊은 경로 매칭 실패
+
+**현상**
+- 파일을 `api/[...path].js`로 두고 배포했을 때 `/api/posts`(1단계)는 200이지만 `/api/posts/123`, `/api/auth/check`(2단계 이상)는 Vercel 자체 404 (`x-vercel-error: NOT_FOUND`)
+- 로컬에선 Koa 라우터가 정상 동작 → 차이는 Vercel의 파일 라우팅 인식
+
+**원인 추정**
+- Vercel이 `[...path]` 브래킷 파일명을 catch-all로 인식 못 하고 단일 동적 세그먼트로만 처리
+
+**해결**
+- 파일명을 `api/index.js`로 변경 (브래킷 제거)
+- `vercel.json`에 모든 URL을 `/api`로 rewrite:
+  ```json
+  { "rewrites": [{ "source": "/(.*)", "destination": "/api" }] }
+  ```
+- `api/index.js` 내부의 Koa app이 원본 `req.url`을 그대로 받아 자체 라우팅 (CORS, JWT, /docs, /api/* 모두 일관 처리)
 

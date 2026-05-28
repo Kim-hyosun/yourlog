@@ -39,7 +39,7 @@ pnpm install
 ```
 blog-backend/
 ├── api/
-│   └── [...path].js      # Vercel serverless 진입점 (catch-all → app.callback())
+│   └── index.js          # Vercel serverless 진입점 (Koa app.callback())
 ├── src/
 │   ├── index.js          # 로컬 dev 진입점 (app.listen만)
 │   ├── app.js            # Koa 앱 구성 (로컬·Vercel 공용)
@@ -51,7 +51,7 @@ blog-backend/
 │   │   ├── checkLoggedIn.js
 │   │   └── rateLimit.js  # 인메모리 레이트리미터 (※ serverless에선 실효 X)
 │   └── models/           # Mongoose 스키마 (User, Post)
-└── (vercel.json 없음 — api/ 폴더 컨벤션만으로 함수 자동 등록)
+└── vercel.json           # 모든 URL을 /api로 rewrite (Koa app이 모든 라우팅 담당)
 ```
 
 ## 실행 흐름
