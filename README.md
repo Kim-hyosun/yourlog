@@ -11,6 +11,9 @@ yourlog/
 실행/빌드 스크립트
 - [backend-swagger 문서 바로가기](https://yourlog-red.vercel.app/docs)
 - [yourlog 서비스 바로가기](https://yourlog-v447.vercel.app/)
+- testID: test 
+- testpw: test123
+- [사용자가 작성한 글목록 페이지 바로가기](https://yourlog-v447.vercel.app/test)
 
 ---
 
