@@ -51,7 +51,7 @@ blog-backend/
 │   │   ├── checkLoggedIn.js
 │   │   └── rateLimit.js  # 인메모리 레이트리미터 (※ serverless에선 실효 X)
 │   └── models/           # Mongoose 스키마 (User, Post)
-└── vercel.json           # Vercel 함수 설정 (maxDuration 등)
+└── (vercel.json 없음 — api/ 폴더 컨벤션만으로 함수 자동 등록)
 ```
 
 ## 실행 흐름

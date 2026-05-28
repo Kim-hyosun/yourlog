@@ -9,8 +9,8 @@ yourlog/
 ```
 
 실행/빌드 스크립트
-- [blog-backend/README.md](blog-backend/README.md)
-- [blog-frontend/README.md](blog-frontend/README.md)
+- [backend-swagger 문서 바로가기](https://yourlog-red.vercel.app/docs)
+- [yourlog 서비스 바로가기](https://yourlog-v447.vercel.app/)
 
 ---
 
@@ -51,7 +51,7 @@ blog-backend/
 │   │   ├── checkLoggedIn.js # 로그인 가드
 │   │   └── rateLimit.js     # 무차별 대입 방지(로컬 한정)
 │   └── models/           # Mongoose 스키마 (User, Post)
-└── vercel.json           # Vercel 함수 설정 (maxDuration 등)
+└── (vercel.json 불필요 — api/ 폴더 컨벤션으로 자동 함수 등록)
 ```
 
 ---
