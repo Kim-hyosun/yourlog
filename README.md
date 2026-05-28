@@ -177,3 +177,38 @@ blog-frontend/src/
 - Node.js (Native ESM 지원, v20 권장)
 - pnpm 9+
 - MongoDB Atlas 계정 (또는 로컬 MongoDB)
+
+---
+
+## 트러블슈팅 기록
+
+### bcrypt 네이티브 바이너리 누락 (Vercel 배포)
+
+**현상**
+- Vercel 백엔드에 배포 후 `/`, `/docs`, `/api/*` 모든 경로가 **500 응답**
+- Function Logs:
+  ```
+  Cannot find module '/var/task/blog-backend/node_modules/.pnpm/bcrypt@5.1.1/
+                      node_modules/bcrypt/lib/binding/napi-v3/bcrypt_lib.node'
+  Require stack: - .../bcrypt/bcrypt.js
+  ```
+- 로컬(macOS)에선 정상 동작 → 환경별 차이라는 단서
+
+**원인**
+- `bcrypt`는 C++ 네이티브 모듈로 플랫폼별 `.node` 바이너리에 의존
+- Vercel은 **빌드 머신과 실행 머신(`/var/task`)이 분리**돼 있고, pnpm의 깊은 nested 경로(`.pnpm/.../binding/napi-v3/`) 바이너리가 함수 번들에 누락됨
+
+**해결**
+- `bcrypt` → **`bcryptjs`**(pure JavaScript 구현)로 교체
+  ```bash
+  pnpm remove bcrypt
+  pnpm add bcryptjs
+  ```
+- `src/models/user.js`의 import만 한 줄 수정 (API 동일):
+  ```diff
+  - import bcrypt from 'bcrypt';
+  + import bcrypt from 'bcryptjs';
+  ```
+- 해시 포맷이 호환되므로 **기존 사용자 비밀번호 마이그레이션 불필요**
+- 성능은 네이티브 대비 ~2배 느리지만 (login 한 번에 ~50ms → ~100ms) 개인 블로그 트래픽에선 체감 영향 없음
+
