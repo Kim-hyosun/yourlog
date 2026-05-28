@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import palette from '../../lib/styles/palette';
 import Button from '../common/Button';
+import Spinner from '../common/Spinner';
 
 /* 회원가입, 로그인 폼 보여줌 */
 const AuthFormBlock = styled.div`
@@ -60,12 +61,26 @@ interface AuthFormProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   error?: string | null;
+  isLoading?: boolean;
 }
 
 const textMap: Record<AuthFormType, string> = {
   login: 'Login',
   register: '회원가입',
 };
+
+const loadingTextMap: Record<AuthFormType, string> = {
+  login: '로그인 중…',
+  register: '가입 중…',
+};
+
+// 버튼 안에서 spinner와 텍스트를 가로로 배치.
+const ButtonContent = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+`;
 
 /* 에러를 보여줌 */
 const ErrorMessage = styled.div`
@@ -81,6 +96,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   onChange,
   onSubmit,
   error,
+  isLoading,
 }) => {
   const text = textMap[type];
   return (
@@ -93,6 +109,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           placeholder="아이디를 입력하세요"
           onChange={onChange}
           value={form.username}
+          disabled={isLoading}
         />
         <StyledInput
           autoComplete="new-password"
@@ -101,6 +118,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           type="password"
           onChange={onChange}
           value={form.password}
+          disabled={isLoading}
         />
         {type === 'register' && (
           <StyledInput
@@ -110,6 +128,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             type="password"
             onChange={onChange}
             value={form.passwordConfirm}
+            disabled={isLoading}
           />
         )}
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -117,8 +136,16 @@ const AuthForm: React.FC<AuthFormProps> = ({
           cyan
           fullWidth
           style={{ marginTop: '1rem' }}
+          disabled={isLoading}
         >
-          {text}
+          {isLoading ? (
+            <ButtonContent>
+              <Spinner size={16} thickness={2} color="white" />
+              {loadingTextMap[type]}
+            </ButtonContent>
+          ) : (
+            text
+          )}
         </ButtonWithMarginTop>
       </form>
       <Footer>

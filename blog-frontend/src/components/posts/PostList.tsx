@@ -6,6 +6,7 @@ import Responsive from '../common/Responsive';
 import Button from '../common/Button';
 import SubInfo from '../common/SubInfo';
 import Tags from '../common/Tags';
+import Spinner from '../common/Spinner';
 import palette from '../../lib/styles/palette';
 import type { Post, User } from '../../types/models';
 
@@ -91,6 +92,13 @@ const Empty = styled.div`
   color: ${palette.gray[6]};
 `;
 
+// 로딩 중 카드 그리드 자리에 들어가는 중앙 정렬 스피너.
+const LoadingArea = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 4rem 1rem;
+`;
+
 // 저장된 Quill HTML에서 태그를 모두 제거해 텍스트 미리보기를 만든다.
 const toPreview = (html: string) =>
   DOMPurify.sanitize(html, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
@@ -151,6 +159,12 @@ const PostList: React.FC<PostListProps> = ({
           </Button>
         )}
       </TopBar>
+
+      {loading && (
+        <LoadingArea>
+          <Spinner size={32} thickness={3} />
+        </LoadingArea>
+      )}
 
       {!loading && posts && posts.length === 0 && (
         <Empty>아직 작성된 글이 없어요. 첫 글을 남겨보세요.</Empty>

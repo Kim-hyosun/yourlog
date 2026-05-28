@@ -8,6 +8,7 @@ import palette from '../../lib/styles/palette';
 import Responsive from '../common/Responsive';
 import SubInfo from '../common/SubInfo';
 import Tags from '../common/Tags';
+import Spinner from '../common/Spinner';
 import type { Post } from '../../types/models';
 
 const PostViewerBlock = styled(Responsive)`
@@ -28,6 +29,13 @@ const PostHead = styled.div`
     margin: 0 0 1.25rem;
     color: ${palette.gray[9]};
   }
+`;
+
+// 로딩 중 본문 자리에 들어가는 중앙 정렬 스피너.
+const LoadingArea = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 5rem 1rem;
 `;
 
 // 본문은 글 가독성을 위해 line-height/letter-spacing 충분히, 폰트 살짝 키움.
@@ -87,7 +95,16 @@ const PostViewer: React.FC<PostViewerProps> = ({
     return <PostViewerBlock>오류 발생!</PostViewerBlock>;
   }
 
-  if (loading || !post) return null;
+  if (loading) {
+    return (
+      <PostViewerBlock>
+        <LoadingArea>
+          <Spinner size={32} thickness={3} />
+        </LoadingArea>
+      </PostViewerBlock>
+    );
+  }
+  if (!post) return null;
 
   const { title, body, user, publishedDate, tags } = post;
   return (

@@ -41,6 +41,7 @@ const LoginForm = () => {
       onChange={onChange}
       onSubmit={onSubmit}
       error={error}
+      isLoading={isLoading}
     />
   );
 };

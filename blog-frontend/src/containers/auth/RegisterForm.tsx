@@ -61,6 +61,7 @@ const RegisterForm = () => {
       onChange={onChange}
       onSubmit={onSubmit}
       error={error}
+      isLoading={isLoading}
     />
   );
 };
