@@ -1,5 +1,6 @@
 import Joi from 'joi';
-import User from '../../models/user';
+import User from '../../models/user.js';
+import { setAuthCookie, clearAuthCookie } from '../../lib/authCookie.js';
 
 /* POST /api/auth/register
 {
@@ -39,18 +40,14 @@ export const register = async (ctx) => {
     ctx.body = user.serialize();
 
     const token = user.generateToken();
-    ctx.cookies.set('access_token', token, {
-      //httpOnly가 활성화된 쿠키에 토큰을 담아줘
-      maxAge: 1000 * 60 * 60 * 24 * 7, //7일
-      httpOnly: true,
-    });
+    setAuthCookie(ctx, token);
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
-/* 
-POST api/auth/login 
+/*
+POST api/auth/login
 {
 	username:'jireh',
 	password:'mypass123'
@@ -85,18 +82,14 @@ export const login = async (ctx) => {
     }
     ctx.body = user.serialize();
     const token = user.generateToken();
-    ctx.cookies.set('access_token', token, {
-      //httpOnly가 활성화된 쿠키에 토큰을 담아줘
-      maxAge: 1000 * 60 * 60 * 24 * 7, //7일
-      httpOnly: true,
-    });
+    setAuthCookie(ctx, token);
   } catch (e) {
     ctx.throw(500, e);
   }
 };
 
-/* 
-GET api/auth/check 
+/*
+GET api/auth/check
 jwtMiddleware에서 검증
 */
 export const check = async (ctx) => {
@@ -116,6 +109,6 @@ POST api/auth/logout
 */
 export const logout = async (ctx) => {
   //로그아웃
-  ctx.cookies.set('access_token');
+  clearAuthCookie(ctx);
   ctx.status = 204; //No content
 };
