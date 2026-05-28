@@ -75,4 +75,11 @@ blog-backend/
 | `NODE_ENV !== 'production'` (로컬) | `httpOnly` | dev proxy로 같은 origin 호출 → 기본 SameSite=Lax로 충분 |
 | `NODE_ENV === 'production'` (Vercel) | `httpOnly, sameSite: 'none', secure: true` | 프론트·백엔드가 다른 도메인 → cross-site로 쿠키가 실리려면 None+Secure 필수 |
 
+## API 문서 (Swagger UI)
+
+- 경로: **`/docs`** (예: `http://localhost:4000/docs`, 배포본은 `https://your-api.vercel.app/docs`)
+- 스펙은 `src/docs/openapi.js`에 손으로 작성한 OpenAPI 3.0 객체. 엔드포인트가 바뀌면 이 파일을 갱신.
+- UI 미들웨어는 DB 연결 단계보다 앞에 마운트돼 있어서 `/docs` 요청은 MongoDB cold start를 트리거하지 않음.
+- 접근은 공개 — 운영 단계에서 막고 싶다면 `app.js`에서 `process.env.NODE_ENV !== 'production'`일 때만 마운트하거나 헤더 토큰 가드 추가.
+
 

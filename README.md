@@ -151,6 +151,8 @@ blog-frontend/src/
 
 > 백엔드는 API 레벨에선 글 조회를 인증 없이 허용. 프론트의 `/posts` 가드는 클라이언트 UX 차원의 정책.
 
+대화형 문서는 백엔드의 **`/docs`** (Swagger UI) — 예: `http://localhost:4000/docs`. 스펙 정의 파일은 `blog-backend/src/docs/openapi.js`.
+
 ---
 
 ## 배포 토폴로지

@@ -8,9 +8,11 @@ import Koa from 'koa';
 import Router from 'koa-router';
 import bodyParser from 'koa-bodyparser';
 import cors from '@koa/cors';
+import { koaSwagger } from 'koa2-swagger-ui';
 import api from './api/index.js';
 import jwtMiddleware from './lib/jwtMiddleware.js';
 import { connectDB } from './db.js';
+import openApiSpec from './docs/openapi.js';
 
 const app = new Koa();
 const router = new Router();
@@ -21,6 +23,16 @@ app.use(
   cors({
     origin: CLIENT_ORIGIN || 'http://localhost:3000',
     credentials: true,
+  }),
+);
+
+// Swagger UI는 정적 HTML/JS만 내려주므로 DB 연결 미들웨어보다 앞에 둔다.
+// (/docs 요청에서 mongo connect 시도를 막아 cold start 비용 0)
+app.use(
+  koaSwagger({
+    routePrefix: '/docs',
+    swaggerOptions: { spec: openApiSpec },
+    hideTopbar: true,
   }),
 );
 
