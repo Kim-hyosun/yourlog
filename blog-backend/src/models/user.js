@@ -1,5 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs'; // pure JS — Vercel serverless에서 네이티브 바이너리 누락 이슈 회피
 import jwt from 'jsonwebtoken';
 
 const UserSchema = new Schema({
